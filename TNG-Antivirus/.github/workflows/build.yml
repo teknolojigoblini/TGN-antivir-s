@@ -1,0 +1,39 @@
+name: Build Windows EXE with Manifest
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install pyinstaller psutil colorama
+    
+    - name: Build EXE with Manifest
+      run: |
+        pyinstaller --onefile `
+          --name "TNG_Antivirus" `
+          --manifest "TNG_Antivirus.exe.manifest" `
+          --console `
+          TNG_Antivirus_V9.py
+    
+    - name: Upload EXE
+      uses: actions/upload-artifact@v4
+      with:
+        name: TNG_Antivirus_Windows
+        path: dist/TNG_Antivirus.exe
+        retention-days: 30
